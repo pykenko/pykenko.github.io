@@ -14,7 +14,7 @@ title = "Blowfish"
   dateFormat = "2 January 2006"
 
 [params.author]
-  name = "Your name here"
+  name = "auric"
   image = "img/blowfish_logo.png"
   headline = "I'm only human"
   bio = "A little bit about you"
