@@ -1,7 +1,7 @@
 ---
 title: "Malta CTF 2025"
 description: "Cool CTF"
-date: jun 2025
+date: 2025-06-21
 tags: ["Cryptography"]
 categories: ["Writeups"]
 showTableOfContents: true
