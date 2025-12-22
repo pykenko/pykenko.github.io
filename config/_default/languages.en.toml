@@ -2,7 +2,7 @@ languageCode = "en"
 languageName = "English"
 weight = 1
 
-title = "Blowfish"
+title = "auric blog"
 
 [params]
   displayName = "EN"
@@ -15,8 +15,8 @@ title = "Blowfish"
 
 [params.author]
   name = "auric"
-  image = "img/blowfish_logo.png"
-  headline = "I'm only human"
+  image = "imges/profile.png"
+  headline = "Newbie CTF player"
   bio = "A little bit about you"
   # links = [
   #   { email = "mailto:hello@your_domain.com" },
