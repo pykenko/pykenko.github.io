@@ -2,7 +2,7 @@ languageCode = "en"
 languageName = "English"
 weight = 1
 
-title = "auric blog"
+title = "Auric blog"
 
 [params]
   displayName = "EN"
@@ -15,7 +15,7 @@ title = "auric blog"
 
 [params.author]
   name = "auric"
-  image = "images/profile.png"
+  image = "img/profile.png"
   headline = "Newbie CTF player"
   bio = "A little bit about you"
   # links = [
