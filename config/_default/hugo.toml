@@ -17,6 +17,9 @@ enableEmoji = true
 
 # googleAnalytics = "G-XXXXXXXXX"
 
+[params]
+  mainSections = ["posts", "writeups"]
+
 [taxonomies]
   tag = "tags"
   category = "categories"
