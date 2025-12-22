@@ -90,5 +90,5 @@ Then we can solve this challenge by solving `g(m) + p * k = m`.
 ![Description of image](/images/maltaCTF2025.png)
 
 {{< alert icon="check-circle" cardColor="#10b981" >}}
-**Flag found:** `maltactf{Ferm4ts_littl3_polyn0mial_tr1ck}`
+**Flag :** `maltactf{Ferm4ts_littl3_polyn0mial_tr1ck}`
 {{< /alert >}}
