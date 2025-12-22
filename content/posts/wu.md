@@ -12,7 +12,7 @@ draft: false
 print("hello world")
 ```
 
-![Description of image](../../logo.png)
+![Description of image](logo.png)
 
 
 {{< alert icon="fire" cardColor="#ef4444" >}}
