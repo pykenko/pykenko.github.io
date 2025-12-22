@@ -12,7 +12,7 @@ draft: false
 print("hello world")
 ```
 
-![Description of image](https://github.com/pykenko/pykenko.github.io/blob/main/logo.png)
+![Description of image](/images/logo.png)
 
 
 {{< alert icon="fire" cardColor="#ef4444" >}}
