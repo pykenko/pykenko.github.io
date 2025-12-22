@@ -150,7 +150,7 @@ http://localhost:\@daffainfo.com/../internal
 
 This will trick the server into going to localhost/internal, but urlparser() will still retrieve the value at @daffainfo.com. However, on the server, we need to provide \\ to prevent Nginx from erroring.
 
-![Description of image](/images/ifestfinal2025.png)
+![Description of image](/images/ifest2025.png)
 
 {{< alert icon="check-circle" cardColor="#10b981" >}}
 **Flag :** `IFEST13{a0526f70f53e2aa1d395ac02b7653498}`
