@@ -7,8 +7,8 @@ categories: ["Writeups"]
 showTableOfContents: true
 draft: false
 ---
-# Team : @PETIR
-# rank : ?
+Team : @PETIR
+rank : ?
 
 ### Title : Web v2
 ```
