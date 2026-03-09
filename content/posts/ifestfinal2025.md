@@ -7,11 +7,10 @@ categories: ["Writeups"]
 showTableOfContents: true
 draft: false
 ---
+# Team : @PETIR
+# rank : ?
 
-### Team : @PETIR
-### rank : ?
-
-# Title : Web v2
+### Title : Web v2
 ```
 Bruh, someone just hacked my website. And now im pretty sure no one will hack my website again!
 
@@ -159,6 +158,6 @@ This will trick the server into going to localhost/internal, but urlparser() wil
 **Flag :** `IFEST13{a0526f70f53e2aa1d395ac02b7653498}`
 {{< /alert >}}
 
-### References :
+# References :
 
 https://book.hacktricks.wiki/en/pentesting-web/proxy-waf-protections-bypass.html

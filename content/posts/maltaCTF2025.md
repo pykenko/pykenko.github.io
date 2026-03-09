@@ -7,11 +7,10 @@ categories: ["Writeups"]
 showTableOfContents: true
 draft: false
 ---
+# Team : @PETIR
+# rank : ?
 
-### Team : @PETIR
-### rank : ?
-
-# Title : Grammar Nazi
+### Title : Grammar Nazi
 ```
 Just another standard RSA implementation.
 
