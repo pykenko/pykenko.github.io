@@ -138,10 +138,17 @@ it computes `p = h2 - sk*h1 + input_sum*g`
 it will accept if p is in a precomputed table
 we have to control this p
 
+H_i is just a public curve point derived from hash_to_point(i)
+
+C_i is the CRS entry that hides the real query value its “real value + mask” The mask uses the secret key sk so only the verifier can remove it
+
+when the prover builds h1 = Σ t_i H_i and h2 = Σ t_i C_i the verifier computes h2 - sk*h1
+
+
 h1 = sum(t_i * h_i)
 h2 = sum(t_i * c_i)
-
-when it computes mask cancels out and leaving only sum(t_i*q_i)*g
+this subtraction cancels the mask and leaves only the real dot product between the hidden query vector and the proof vector
+sum(t_i*q_i)*g
 thats the dot product of proof vector and hidden query vector
 
 `q = q1 + B*(q2-q3)`
@@ -151,6 +158,13 @@ where q2 encodes tensor terms and q3 encodes random linear combinations of all c
 if the witness is correct the constraints are satisfied, so q3 doesn’t hurt, the verifier then expects a value that lands in a precomputed table and honest proofs will hit that table
 
 we dont need to solve the sum fast we only need a wrong c that give a proof that maps into the table entry
+
+we flip only the least significant bit of c this breaks a few local gate constraints around the first adder slice we can patch those constraints by adjusting a tiny set of committed coordinates (a handful of trace entries and two pair entries)
+this keeps the random constraint check `q3` from noticing the change
+
+the hidden vector v determines delta but we can recover the needed pieces using the server as an oracle
+for a “free” pair coordinate (not used in constraints) we add +1 to it and add (-B*t)*G to h2
+if our guess t matches the hidden tensor value the proof still verifies this lets us bruteforce the required values then compute Delta and then use tau = -delta in the real attack
 
 we can start from an honest proof for the correct c0 = a+b mod 2^64
 flip only the least significant bit of c to make it wrong which is c_wrong = c0 ^ 1
