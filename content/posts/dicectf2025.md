@@ -68,8 +68,6 @@ if __name__ == '__main__':
 				print('wrong...')
 ```
 
-you can see from the code that the challenge is asking us for `c = a + b mod 2^64` and the winning move is giving a valid proof with the wrong c
-
 you could see here
 
 ```python
@@ -85,19 +83,57 @@ elif valid and not correct:
 	break
 ```
 
-this is a classic snark zkp challenge
-
-lets understand the snarg logic first
+you can see from the code that the challenge is asking us for `c = a + b mod 2^64` and the winning move is giving a valid proof with the wrong c 20 times
 
 ```python
-def compute_c(args: tuple[int, int, int]) -> bytes:
-	i, qi, sk = args
-	c = qi * P256.G + sk * hash_to_point(i)
-	return SEC1Encoder.encode_public_key(c, compressed=True)
+def build_adder(n: int) -> Circuit:
+    # inputs[0..n-1] = a, inputs[n..2n-1] = b, inputs[2n..3n-1] = c (LSB first)
+    # single output wire constrained to 0 iff a+b == c (mod 2^n)
+    circ = Circuit(3 * n)
+    carry = Wire.constant(False)
+    all_match = Wire.constant(True)
+
+    for i in range(n):
+        a = circ.inputs[i]
+        b = circ.inputs[n + i]
+        c = circ.inputs[2 * n + i]
+
+        a_xor_b = circ.xor_gate(a, b)
+        sum_bit = circ.xor_gate(a_xor_b, carry)
+        carry = circ.or_gate(circ.and_gate(a, b), circ.and_gate(carry, a_xor_b))
+
+        all_match = circ.and_gate(all_match, ~circ.xor_gate(sum_bit, c))
+
+    circ.output_wire(~all_match)
+    return circ
 ```
 
-c_i stores q_i * g and also sk * h_i
-basicly masks the real with a secret key
+the checked relation is the adder circuit
+
+lets understand how the snarg works
+
+the setup builds CRS points as : `C_i = q_i * G + sk * H_i`
+
+```python
+def hash_to_point(i: int) -> Point:
+    p = P256.p
+    for ctr in range(256):
+        x = int.from_bytes(hashlib.sha256(i.to_bytes(8, 'little') + bytes([ctr])).digest()) % p
+        y_sq = (pow(x, 3, p) - 3 * x + P256.b) % p
+        y = pow(y_sq, (p + 1) // 4, p)
+        if pow(y, 2, p) == y_sq:
+            return Point(x, y, curve=P256)
+    raise ValueError(f'hash_to_point failed for i={i}')
+
+def compute_c(args: tuple[int, int, int]) -> bytes:
+    i, qi, sk = args
+    c = qi * P256.G + sk * hash_to_point(i)
+    return SEC1Encoder.encode_public_key(c, compressed=True)
+```
+
+H_i is public (hash_to_point(i))
+q_i is hidden query coefficient
+sk is verifier secret
 
 ```python
 def prove(circuit: Circuit, inputs: list[int], pk: BinaryIO) -> Proof:
@@ -116,61 +152,81 @@ def prove(circuit: Circuit, inputs: list[int], pk: BinaryIO) -> Proof:
     return proof
 ```
 
-prover mixes everything with coefficients t_i
-h1 = sum of only mask basis H_i with weights t_i
-h2 = sum of c_i with weights t_i
+prover sends two points
+`h1 = Σ t_i H_i`
+`h2 = Σ t_i C_i`
 
 ```python
-#snarg.py
 def verify(inputs: list[int], st: State, proof: Proof) -> bool:
-	sk, q_inputs, table = st
-	assert len(inputs) == len(q_inputs)
-	assert all(x in (0, 1) for x in inputs)
-	h1, h2 = proof
-	p = h2 - sk * h1
-	input_sum = sum(q_inputs[i] * inputs[i] for i in range(len(inputs)))
-	p += input_sum * P256.G
-	p_enc = SEC1Encoder.encode_public_key(p, compressed=True)
-	return p_enc in table
+    sk, q_inputs, table = st
+    assert len(inputs) == len(q_inputs)
+    assert all(x in (0, 1) for x in inputs)
+    h1, h2 = proof
+    p = h2 - sk * h1
+    input_sum = sum(q_inputs[i] * inputs[i] for i in range(len(inputs)))
+    p += input_sum * P256.G
+    p_enc = SEC1Encoder.encode_public_key(p, compressed=True)
+    return p_enc in table
 ```
 
-it computes `p = h2 - sk*h1 + input_sum*g`
-it will accept if p is in a precomputed table
-we have to control this p
+and the verifier computes
 
-H_i is just a public curve point derived from hash_to_point(i)
+`p = h2 - sk*h1 + input_sum*G`
 
-C_i is the CRS entry that hides the real query value its “real value + mask” The mask uses the secret key sk so only the verifier can remove it
+the key cancellation is `h2 - sk*h1`: mask terms drop out leaving only the hidden dot product part
 
-when the prover builds h1 = Σ t_i H_i and h2 = Σ t_i C_i the verifier computes h2 - sk*h1
+```python
+def sample(circuit: Circuit, bound1: int, bound2: int) -> tuple[Vector, State]:
+    n = trace_len(circuit)
+    b = n * bound1 + 1
+    q1, q2 = tensor_queries(circuit, bound1)
+    q3, val = constraint_query(circuit, bound2)
+    q = [q1[i] + b * (q2[i] - q3[i]) for i in range(proof_len(circuit))]
+    st = (b, val)
+    return (q, st)
+```
 
+`q` is sampled as : `q = q1 + B*(q2 - q3)`
 
-h1 = sum(t_i * h_i)
-h2 = sum(t_i * c_i)
-this subtraction cancels the mask and leaves only the real dot product between the hidden query vector and the proof vector
-sum(t_i*q_i)*g
-thats the dot product of proof vector and hidden query vector
+```python
+def tensor_queries(circuit: Circuit, bound: int) -> tuple[Vector, Vector]:
+    n = trace_len(circuit)
+    v = [random.randint(-bound, bound) for _ in range(n)]
+    q1 = [0] * proof_len(circuit)
+    q2 = [0] * proof_len(circuit)
+    for i in range(n):
+        q1[i] = v[i]
+        for j in range(i + 1):
+            q2[pair_index(circuit, i, j)] = v[i] * v[j] if i == j else 2 * v[i] * v[j]
+    return (q1, q2)
+```
 
-`q = q1 + B*(q2-q3)`
+this is where `q1` and `q2` are built in
 
-where q2 encodes tensor terms and q3 encodes random linear combinations of all circuit constraints B is a large constant
+```python
+def constraint_query(circuit: Circuit, bound: int) -> tuple[Vector, int]:
+    query = [0] * proof_len(circuit)
+    val = 0
+    constraints = chain(input_constraints(circuit), gate_constraints(circuit), output_constraints(circuit))
+    for constraint in constraints:
+        r = random.randint(-bound, bound)
+        for idx, scalar in constraint.scalars:
+            query[idx] += r * scalar
+        val += r * constraint.constant
+    return (query, val)
+```
 
-if the witness is correct the constraints are satisfied, so q3 doesn’t hurt, the verifier then expects a value that lands in a precomputed table and honest proofs will hit that table
+`q3` is random linear combination of input gate output constraints
 
-we dont need to solve the sum fast we only need a wrong c that give a proof that maps into the table entry
+delta = B*(2*w64*w0 + w128^2) + (w128 - 2*w192 + w193 - w194 + w196 + w200).
 
-we flip only the least significant bit of c this breaks a few local gate constraints around the first adder slice we can patch those constraints by adjusting a tiny set of committed coordinates (a handful of trace entries and two pair entries)
-this keeps the random constraint check `q3` from noticing the change
+# exploit
 
-the hidden vector v determines delta but we can recover the needed pieces using the server as an oracle
-for a “free” pair coordinate (not used in constraints) we add +1 to it and add (-B*t)*G to h2
-if our guess t matches the hidden tensor value the proof still verifies this lets us bruteforce the required values then compute Delta and then use tau = -delta in the real attack
-
-we can start from an honest proof for the correct c0 = a+b mod 2^64
-flip only the least significant bit of c to make it wrong which is c_wrong = c0 ^ 1
-apply a tiny mutation to the committed proof coordinates so all linear constraints still look satisfied mutate to h1/h2
-that mutation shifts the verifiers scalar by some value Delta
-add a correction tau*G to h2 so the verifier’s scalar is unchanged
+1. build honest proof for correct `c0=(a+b) mod 2^64`
+2. flip only bit 0 `c_wrong = c0 ^ 1`
+3. apply a sparse mutation on committed coordinates so local linear constraints still balance
+4. this induces scalar shift `delta`
+5. add correction `tau*G` with `tau=-delta`, so verifier lands back on accepted scalar
 
 # solver :
 
