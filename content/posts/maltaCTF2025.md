@@ -2,6 +2,7 @@
 title: "Malta CTF 2025"
 description: "Cool CTF"
 date: 2025-06-21
+summary: "Team: @PETIR | Brief overview of how I solved the crypto challenges."
 tags: ["Cryptography"]
 categories: ["Writeups"]
 showTableOfContents: true

@@ -2,6 +2,7 @@
 title: "ifest CTF 2025"
 description: "Local onsite Indonesia CTF"
 date: 2025-05-24
+summary: "Team: @PETIR | Brief overview of how I solved the web challenges."
 tags: ["Web Exploitation"]
 categories: ["Writeups"]
 showTableOfContents: true
