@@ -2,6 +2,7 @@
 title: "Dice CTF 2026"
 date: 2026-03-08
 description: "Writeup for Dice CTF 2026"
+summary: "Team: @Blue Water Crypto/dot | Brief overview of how we solved the crypto challenges."
 tags: ["cryptography"]
 categories: ["CTF-Writeups"]
 showTableOfContents: true
