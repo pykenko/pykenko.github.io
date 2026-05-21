@@ -150,7 +150,7 @@ We successfully gotten an `admin` privileged account what now?
 
 The `rabbit hole`, because of the challenge name i was too focused on bypassing the DOMPurify and this is a very bad thing to do the reason is
 
-Looking at the file format i thought it was you typical XSS bot setup so i literally skipped reading the bot.js 
+Looking at the file format i thought it was your typical XSS bot setup so i literally skipped reading the bot.js 
 
 ```
 app.js
