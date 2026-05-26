@@ -1,5 +1,5 @@
 ---
-title: "Playit CTF 2026 quals"
+title: "Playit CTF 2026 qual"
 description: "okay CTF"
 date: 2026-06-24
 summary: "Team: @PETIR | Pyjail misc chalenge."
