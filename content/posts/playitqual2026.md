@@ -91,6 +91,8 @@ Funny enough the word `flag` was also banned so we could also forge the filename
 
 ![Description of image](/images/zalgo8.png)
 
+Pretty easy challenge :D
+
 {{< alert icon="check-circle" cardColor="#10b981" >}}
 **Flag :** `PLAYIT{w1_w0k_d3_T0K_N0t_Onle_ToK_d3_T0k}`
 {{< /alert >}}
