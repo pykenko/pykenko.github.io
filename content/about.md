@@ -1,8 +1,10 @@
 ---
 title: "About"
 layout: "simple"
-menu: "main"
-weight: 10
+url: "/about/"
+menu:
+  main:
+    weight: 10
 ---
 
 Hi, I'm Renko Varel Angelo or Auric
