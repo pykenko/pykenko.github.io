@@ -1,7 +1,7 @@
 ---
 title: "Playit CTF 2026 qual"
 description: "okay CTF"
-date: 2025-06-24
+date: 2026-06-24
 summary: "Team: @PETIR | Pyjail misc chalenge."
 tags: ["Misc"]
 categories: ["Writeups"]
