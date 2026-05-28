@@ -59,7 +59,7 @@ enableCodeCopy = true
   showAuthorsBadges = false 
   showWordCount = true
   showSummary = true
-  sharingLinks = [ "linkedin, discord", "github"]
+  sharingLinks = [ "linkedin", "discord", "github"]
 
 [list]
   showBreadcrumbs = false
